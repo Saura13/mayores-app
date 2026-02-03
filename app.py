@@ -47,7 +47,7 @@ FORMATO DE RESPUESTA:
 
 # Iniciamos el modelo
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash", # Usamos Flash porque es rápido y barato
+    model_name="gemini-1.5-flash-latest",, # Usamos Flash porque es rápido y barato
     system_instruction=system_instruction
 )
 
@@ -85,4 +85,5 @@ if prompt := st.chat_input("Escribe aquí (ej: me duelen las rodillas, ¿qué ha
         st.markdown(response.text)
     
     # 3. Guardar respuesta de la IA
+
     st.session_state.messages.append({"role": "model", "content": response.text})
