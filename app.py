@@ -1,102 +1,122 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
+# --- 1. CONFIGURACIÓN VISUAL DE ALTO IMPACTO ---
 st.set_page_config(
-    page_title="Asistente Vital +65",
+    page_title="Vitalidad +65",
     page_icon="🌿",
-    layout="centered"
+    layout="wide"  # Usamos el ancho completo para parecer una app de escritorio
 )
 
-# --- TÍTULO Y PRESENTACIÓN ---
-st.title("🌿 Asistente de Bienestar Activo")
-st.markdown("""
-*Tu guía personal para mantenerte activo y saludable a cualquier edad.*
-""")
-
-# --- CONFIGURACIÓN DE LA IA (GEMINI) ---
+# --- 2. CONFIGURACIÓN DE LA IA ---
 try:
-    # Capturamos la clave secreta de la configuración de Streamlit
     api_key = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=api_key)
 except Exception as e:
-    st.error("⚠️ No se encontró la API Key. Asegúrate de haberla puesto en 'Secrets'.")
+    st.error("⚠️ Error: No se encontró la API Key en los 'Secrets'.")
     st.stop()
 
-# --- INSTRUCCIONES DEL SISTEMA (Tu "Personalidad") ---
+# --- 3. CEREBRO ENTRENADO (Prompt del Sistema) ---
 system_instruction = """
-Rol: Eres un Entrenador Virtual Empático y Dinámico para adultos mayores.
-Tono: Motivador, claro y respetuoso. NUNCA uses jerga médica compleja sin explicarla.
+Rol: Eres un Entrenador Fisiológico Especializado en Geriatría.
+Tono: Profesional pero cálido, motivador y extremadamente claro.
 
-BASE DE CONOCIMIENTO (RESUMEN CIENTÍFICO):
-1. EL MANTRA: Cualquier movimiento es mejor que estar sentado. Objetivo ideal: 150 min/semana moderados.
-2. INTENSIDAD:
-   - 🟢 Ligera: Puedes cantar.
-   - 🟡 Moderada: Puedes hablar pero no cantar.
-   - 🔴 Vigorosa: Pocas palabras antes de tomar aire.
-3. LOS 4 PILARES: 
-   - Aeróbico (Caminar, nadar).
-   - Fuerza (Mínimo 2 días/semana, pesas o bandas).
-   - Equilibrio (Tai Chi, caminar en línea).
-   - Flexibilidad (Estiramientos).
+BASE DE CONOCIMIENTO (ESTRICTA):
+1. REGLA DE ORO: "Cualquier movimiento cuenta". El sedentarismo es el enemigo.
+2. LOS 4 PILARES DEL EJERCICIO (Recomienda combinarlos):
+   - Aeróbico (Caminar, baile).
+   - Fuerza/Resistencia (Vital para sarcopenia, min 2 días/sem).
+   - Equilibrio (Prevención de caídas).
+   - Flexibilidad (Rango de movimiento).
+3. INTENSIDAD (Test del Habla):
+   - Moderada (3-5.9 METs): Puedes hablar pero no cantar.
+   - Vigorosa (>=6 METs): Solo dices unas palabras.
 4. SEGURIDAD:
-   - Diabetes: Comer algo antes, vigilar pies.
-   - Artrosis: Ejercicio acuático o bajo impacto.
-   - Fragilidad/Riesgo de caídas: Empezar con fuerza y equilibrio antes que aeróbico.
+   - Ante dolor agudo: PARAR.
+   - Diabetes: Snack a mano.
+   - Hipertensión: Evitar contener la respiración (Valsalva).
+   - Fragilidad: Priorizar fuerza y equilibrio antes que aeróbico intenso.
 
-FORMATO DE RESPUESTA:
-- Usa emojis para hacerlo visual.
-- Usa listas con viñetas cortas.
-- Usa negritas para las ideas clave.
-- Termina siempre con una pregunta motivadora sencilla.
+FORMATO: Usa emojis, negritas para conceptos clave y listas. Sé breve.
 """
 
-# --- INICIAR EL MODELO ---
-# Usamos el modelo que confirmamos que tienes disponible
 model = genai.GenerativeModel(
     model_name="models/gemini-2.5-flash", 
     system_instruction=system_instruction
 )
 
-# --- HISTORIAL DEL CHAT ---
+# --- 4. BARRA LATERAL (SIDEBAR) - EL "DASHBOARD" ---
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/2966/2966334.png", width=100)
+    st.title("📚 Guía Rápida")
+    
+    st.info("**Objetivo Semanal:**\n150 min. actividad moderada + 2 días de fuerza.")
+    
+    st.markdown("### 🚦 Semáforo de Esfuerzo")
+    st.success("🟢 **Ligero:** Puedes Cantar")
+    st.warning("🟡 **Moderado:** Puedes Hablar")
+    st.error("🔴 **Vigoroso:** Falta el aire")
+    
+    st.divider()
+    st.caption("⚠️ Nota: Consulta a tu médico antes de iniciar programas intensos. Basado en guías clínicas de AAFP.")
+    
+    # Botón para reiniciar
+    if st.button("🗑️ Borrar Conversación", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
+
+# --- 5. ZONA PRINCIPAL ---
+st.header("🌿 Vitalidad +65: Tu Asistente Activo")
+st.markdown("Bienvenido. *El movimiento es vida.* ¿En qué nos enfocamos hoy?")
+
+# --- 6. BOTONES DE ACCIÓN RÁPIDA (Novedad) ---
+# Creamos 3 columnas para botones que evitan escribir
+col1, col2, col3 = st.columns(3)
+
+prompt_seleccionado = None
+
+with col1:
+    if st.button("💪 Crear Rutina de Fuerza", use_container_width=True):
+        prompt_seleccionado = "Genérame una rutina sencilla de fuerza para hacer en casa con objetos cotidianos (botellas, sillas)."
+with col2:
+    if st.button("🦿 Dolor de Rodillas", use_container_width=True):
+        prompt_seleccionado = "Tengo artrosis leve en las rodillas. ¿Qué ejercicios son seguros y cuáles debo evitar?"
+with col3:
+    if st.button("⚖️ Mejorar Equilibrio", use_container_width=True):
+        prompt_seleccionado = "Tengo miedo a caerme. Dame 3 ejercicios de equilibrio muy seguros para principiantes."
+
+# --- 7. LÓGICA DEL CHAT ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
-    # Mensaje de bienvenida
     st.session_state.messages.append({
         "role": "model",
-        "content": "¡Hola! Soy tu asistente de ejercicio. ¿Cómo te sientes hoy para moverte un poco? 🚶‍♂️💪"
+        "content": "Hola. Estoy aquí para ayudarte a moverte de forma segura. ¿Por dónde empezamos hoy? 🚶‍♂️"
     })
 
-# Mostrar mensajes anteriores
+# Mostrar historial
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# --- INTERACCIÓN CON EL USUARIO ---
-if prompt := st.chat_input("Escribe aquí (ej: ¿Qué ejercicios puedo hacer sentado?)"):
+# Capturar entrada (ya sea por botón o por escritura manual)
+if prompt := (st.chat_input("Escribe tu duda aquí...") or prompt_seleccionado):
     
-    # 1. Mostrar lo que el usuario escribió
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    # Mostrar lo que el usuario "dijo"
+    if not prompt_seleccionado: # Si fue botón, ya se entiende la acción, si es texto lo pintamos
+        with st.chat_message("user"):
+            st.markdown(prompt)
+    else:
+        with st.chat_message("user"):
+            st.markdown(f"**Opción Rápida:** {prompt}")
+            
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # 2. Generar respuesta de la IA
+    # Respuesta de la IA
     with st.chat_message("model"):
-        try:
-            # Preparamos el historial para enviarlo
-            # Nota: Gemini espera el historial en un formato específico
-            history_gemini = [
-                {"role": m["role"], "parts": [m["content"]]} 
-                for m in st.session_state.messages[:-1] 
-            ]
-            
+        with st.spinner("Consultando guía clínica..."):
+            history_gemini = [{"role": m["role"], "parts": [m["content"]]} for m in st.session_state.messages[:-1]]
             chat = model.start_chat(history=history_gemini)
             response = chat.send_message(prompt)
-            
             st.markdown(response.text)
             
-            # 3. Guardar respuesta
-            st.session_state.messages.append({"role": "model", "content": response.text})
-            
-        except Exception as e:
-            st.error(f"Ocurrió un error al conectar: {e}")
+    st.session_state.messages.append({"role": "model", "content": response.text})
